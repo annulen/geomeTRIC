@@ -570,7 +570,12 @@ class Optimizer(object):
         else:
             colors['energy'] = "\x1b[92m" if Converged_energy else "\x1b[91m"
             colors['quality'] = "\x1b[91m"
-            step_state = StepState.Reject if (Quality < -1.0 or params.transition) else StepState.Poor
+            if not params.reset:
+                step_state = StepState.Reject
+                # Use guessed hessian since next step and reset it when needed
+                params.reset = True
+            else:
+                step_state = StepState.Reject if (Quality < -1.0 or params.transition) else StepState.Poor
         if 'energy' not in colors: colors['energy'] = "\x1b[92m" if Converged_energy else "\x1b[0m"
         if 'quality' not in colors: colors['quality'] = "\x1b[0m"
         colors['grms'] = "\x1b[92m" if Converged_grms else "\x1b[0m"
