@@ -81,7 +81,8 @@ class OptParams(object):
         # optimization step is larger than Convergence_drms, the step is rejected, then (almost) the same step
         # is attempted again. Therefore, the minimum trust radius should be set smaller than the convergence
         # criterion to avoid this infinite loop scenario.
-        self.tmin = kwargs.get('tmin', min(1.0e-4, self.Convergence_drms*0.1))
+        self.tmin = kwargs.get('tmin', min(max(1.0e-4, self.Convergence_drms * 0.1), self.Convergence_drms))
+        logger.info(f"{self.tmin = }")
         # Use maximum component instead of RMS displacement when applying trust radius.
         self.usedmax = kwargs.get('usedmax', False)
         # Sanity checks on trust radius
