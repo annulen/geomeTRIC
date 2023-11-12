@@ -458,7 +458,7 @@ class Optimizer(object):
         # If the full-size step is within the trust radius, then call get_delta_prime again with diagnostic messages if needed
         if (self.params.verbose >= 2 and self.params.verbose < 4 and self.cnorm <= 1.1*self.trust):
             self.get_delta_prime(v0, verbose=self.params.verbose+2)
-        if params.verbose: logger.info("  Optimizer.step : Internal-step: %.4f Cartesian-step: %.4f Trust-radius: %.4f\n" % (inorm, self.cnorm, self.trust))
+        logger.info("  Optimizer.step : Internal-step: %.4f Cartesian-step: %.4f Trust-radius: %.4f\n" % (inorm, self.cnorm, self.trust))
         # If the step is above the trust radius in Cartesian coordinates, then
         # do the following to reduce the step length:
         if self.cnorm > 1.1 * self.trust:
@@ -589,7 +589,7 @@ class Optimizer(object):
         self.conSatisfied = not self.IC.haveConstraints() or self.IC.maxConstraintViolation(self.X) < params.Convergence_cmax
         # Print status
         msg = "Step %4i :" % self.Iteration
-        msg += " Displace = %s%.3e\x1b[0m/%s%.3e\x1b[0m (rms/max)" % (colors['drms'], rms_displacement, colors['dmax'], max_displacement)
+        msg += " Displace = %.3e/%s%.3e\x1b[0m/%s%.3e\x1b[0m (norm/rms/max)" % (self.cnorm, colors['drms'], rms_displacement, colors['dmax'], max_displacement)
         msg += " Trust = %.3e (%s)" % (self.trust, self.trustprint)
         msg += " Grad%s = %s%.3e\x1b[0m/%s%.3e\x1b[0m (rms/max)" % ("_T" if self.IC.haveConstraints() else "", colors['grms'], rms_gradient, colors['gmax'], max_gradient)
         logger.info(msg + " E (change) = % .10f (%s%+.3e\x1b[0m) Quality = %s%.3f\x1b[0m" % (self.E, colors['energy'], self.E-self.Eprev, colors['quality'], Quality) + "\n")
