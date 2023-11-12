@@ -574,6 +574,7 @@ class Optimizer(object):
                 step_state = StepState.Reject
                 # Use guessed hessian since next step and reset it when needed
                 params.reset = True
+                reset_hessian_now = True
             else:
                 step_state = StepState.Reject if (Quality < -1.0 or params.transition) else StepState.Poor
         if 'energy' not in colors: colors['energy'] = "\x1b[92m" if Converged_energy else "\x1b[0m"
@@ -679,7 +680,7 @@ class Optimizer(object):
             elif self.farConstraints:
                 logger.info("\x1b[93mNot rejecting step - far from constraint satisfaction\x1b[0m\n")
             else:
-                logger.info("\x1b[93mRejecting step - quality is lower than %.1f\x1b[0m\n" % (0.0 if params.transition else -1.0))
+                logger.info("\x1b[93mRejecting step - quality is lower than %.1f\x1b[0m\n" % (0.0 if params.transition or reset_hessian_now else -1.0))
                 self.trustprint = "\x1b[1;91mx\x1b[0m"
                 # Store the rejected step.  In case the next step is identical to the rejected one, the next step should be accepted to avoid infinite loops.
                 self.X_rj = self.X.copy()
@@ -690,6 +691,10 @@ class Optimizer(object):
                 self.E = self.Eprev
                 self.engine.load_guess_files(self.dirname)
                 self.recalcHess = False
+                if reset_hessian_now:
+                    logger.info("Resetting hessian to guess\n")
+                    self.checkCoordinateSystem(recover=True)
+                    #self.H = self.IC.guess_hessian(self.X)
                 return
 
         # Append steps to history (for rebuilding Hessian)
